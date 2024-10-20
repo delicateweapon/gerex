@@ -1,4 +1,5 @@
 #include "nfa.h"
+#include "parse.h"
 #include "util.h"
 
 #include <stdbool.h>
@@ -11,18 +12,26 @@ struct test_case {
 
 int main(void) {
     // regex: a(b|e)*c
-    NFA *nfa = nfa_concat_multiple(
-        3, nfa_from_symbol('a'),
-        nfa_closure(nfa_union(nfa_from_symbol('b'), nfa_from_symbol('e'))),
-        nfa_from_symbol('c'));
+    // NFA *nfa = nfa_concat_multiple(
+    //     3, nfa_from_symbol('a'),
+    //     nfa_closure(nfa_union(nfa_from_symbol('b'), nfa_from_symbol('e'))),
+    //     nfa_from_symbol('c'));
+    // const struct test_case test_cases[] = {
+    //     {"abebec", true}, {"abc", true},    {"ac", true},    {"abbbbc",
+    //     true},
+    //     {"bbbc", false},  {"abbbb", false}, {"abcd", false}, {"aeeec", true},
+    // };
+
+    // regex ab*c
+    NFA nfa_np = parse_regex_to_nfa("ab*c");
+    NFA *nfa = &nfa_np;
     const struct test_case test_cases[] = {
-        {"abebec", true}, {"abc", true},    {"ac", true},    {"abbbbc", true},
-        {"bbbc", false},  {"abbbb", false}, {"abcd", false}, {"aeeec", true},
+        {"abc", true},   {"ac", true},     {"abbbbc", true},
+        {"bbbc", false}, {"abbbb", false}, {"abcd", false},
     };
 
     size_t test_count = ARRAY_SIZE(test_cases);
-    bool expected;
-    bool actual;
+    bool expected, actual;
     struct test_case test;
 
     for (size_t i = 0; i < test_count; ++i) {
