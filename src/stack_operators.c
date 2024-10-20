@@ -18,7 +18,7 @@ void stack_append(Stack *stack, StackItem *item) {
     stack->count++;
 }
 
-StackItem stack_view_top(Stack *stack) {
+inline StackItem stack_view_top(Stack *stack) {
     StackItem result;
     if (stack->count == 0) {
         result.code = -1;
