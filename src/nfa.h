@@ -27,6 +27,7 @@ void nfa_destroy(NFA *nfa);
 
 typedef enum {
     NFA_OPERATOR_LPAREN,
+    NFA_OPERATOR_RPAREN,
     NFA_OPERATOR_CLOSURE,
     NFA_OPERATOR_CONCAT,
     NFA_OPERATOR_UNION,

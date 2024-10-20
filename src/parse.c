@@ -6,88 +6,111 @@
 #include <ctype.h>
 #include <stdio.h>
 
-static inline void nfa_operator_collapse(Stack *nfa_operator_stack,
-                                         Stack *nfa_stack) {
-    StackItem s_item = stack_view_top(nfa_operator_stack);
+static Stack *nfa_stack;
+static Stack *nfa_op_stack;
+static StackItem item;
 
-    switch (s_item.nfa_operator) {
-    case NFA_OPERATOR_LPAREN:
-        break;
-    case NFA_OPERATOR_CLOSURE:
-        s_item.nfa = nfa_closure(stack_pop(nfa_stack).nfa);
-        stack_append(nfa_stack, s_item);
-        break;
-    case NFA_OPERATOR_CONCAT:
-        NFA *nfa1 = stack_pop(nfa_stack).nfa;
-        NFA *nfa2 = stack_pop(nfa_stack).nfa;
-        s_item.nfa = nfa_concat(nfa2, nfa1);
-        stack_append(nfa_stack, s_item);
-        break;
-    case NFA_OPERATOR_UNION:
-        s_item.nfa =
-            nfa_union(stack_pop(nfa_stack).nfa, stack_pop(nfa_stack).nfa);
-        stack_append(nfa_stack, s_item);
-        break;
+static int precedence[] = {
+    [NFA_OPERATOR_LPAREN] = 0,  [NFA_OPERATOR_RPAREN] = 0,
+    [NFA_OPERATOR_UNION] = 1,   [NFA_OPERATOR_CONCAT] = 2,
+    [NFA_OPERATOR_CLOSURE] = 3,
+};
+
+static StackItem top;
+static inline void nfa_op_stack_collapse(NFA_Operator op) {
+    if (nfa_op_stack->count != 0) {
+        do {
+            top = stack_view_top(nfa_op_stack);
+            if (precedence[top.nfa_operator] < precedence[op]) {
+                break;
+            }
+            stack_pop(nfa_op_stack);
+            NFA *nfa1, *nfa2;
+            switch (top.nfa_operator) {
+            case NFA_OPERATOR_CLOSURE:
+                item.nfa = nfa_closure(stack_pop(nfa_stack).nfa);
+                stack_append(nfa_stack, item);
+                break;
+            case NFA_OPERATOR_CONCAT:
+                nfa1 = stack_pop(nfa_stack).nfa;
+                nfa2 = stack_pop(nfa_stack).nfa;
+                item.nfa = nfa_concat(nfa2, nfa1);
+                stack_append(nfa_stack, item);
+                break;
+            case NFA_OPERATOR_UNION:
+                nfa1 = stack_pop(nfa_stack).nfa;
+                nfa2 = stack_pop(nfa_stack).nfa;
+                item.nfa = nfa_union(nfa1, nfa2);
+                stack_append(nfa_stack, item);
+                break;
+            default:
+                // the precedence order wont allow for anything else
+                break;
+            }
+        } while (nfa_op_stack->count == 0);
     }
 }
 
-NFA parse_regex_to_nfa(const char *regex) {
-    size_t i;
-    char c;
-    StackItem s_item;
-    bool should_concat;
-
-    Stack *nfa_stack = stack_create(sizeof(NFA *), 16);
-    Stack *nfa_operator_stack = stack_create(sizeof(NFA_Operator), 16);
-
-    i = 0;
-    c = regex[i];
-    should_concat = false;
+int parse_regex_to_nfa(NFA *nfa, const char *regex) {
+    size_t i = 0;
+    char c = regex[i];
+    bool append_concat = false;
 
     while (c != '\0') {
 
         switch (c) {
-        case '(':
-            if (should_concat) {
-                s_item.nfa_operator = NFA_OPERATOR_CONCAT;
-                stack_append(nfa_operator_stack, s_item);
-                should_concat = false;
-            }
-            s_item.nfa_operator = NFA_OPERATOR_LPAREN;
-            stack_append(nfa_operator_stack, s_item);
-            should_concat = false;
-            break;
         case ')':
-            should_concat = true;
+            nfa_op_stack_collapse(item.nfa_operator);
+            if (top.nfa_operator != NFA_OPERATOR_LPAREN) {
+                LOG_ERROR("Invalid expression");
+                return -1;
+            }
             break;
+
         case '*':
-            s_item.nfa_operator = NFA_OPERATOR_CLOSURE;
-            stack_append(nfa_operator_stack, s_item);
+            if (nfa_stack->count == 0) {
+                LOG_ERROR("Invalid expression");
+                return -1;
+            }
+            item.nfa_operator = NFA_OPERATOR_CLOSURE;
+            nfa_op_stack_collapse(item.nfa_operator);
+            stack_append(nfa_op_stack, item);
+            append_concat = false;
             break;
+
         case '|':
-            s_item.nfa_operator = NFA_OPERATOR_UNION;
-            stack_append(nfa_operator_stack, s_item);
+            if (nfa_stack->count == 0) {
+                LOG_ERROR("Invalid expression");
+                return -1;
+            }
+            item.nfa_operator = NFA_OPERATOR_UNION;
+            nfa_op_stack_collapse(item.nfa_operator);
+            stack_append(nfa_op_stack, item);
+            append_concat = false;
             break;
-        default:
         }
 
         if (isalnum(c)) {
-            if (should_concat) {
-                s_item.nfa_operator = NFA_OPERATOR_CONCAT;
-                stack_append(nfa_operator_stack, s_item);
-                should_concat = false;
+            if (append_concat) {
+                item.nfa_operator = NFA_OPERATOR_CONCAT;
+                nfa_op_stack_collapse(item.nfa_operator);
+                stack_append(nfa_op_stack, item);
+                append_concat = false;
             }
-            s_item.nfa = nfa_from_symbol(c);
-            stack_append(nfa_stack, s_item);
-            should_concat = true;
+            item.nfa = nfa_from_symbol(c);
+            stack_append(nfa_stack, item);
+            append_concat = true;
         }
-
         c = regex[++i];
     }
 
-    nfa_operator_collapse(nfa_operator_stack, nfa_stack);
-    NFA result = *stack_view_top(nfa_stack).nfa;
+    if (nfa_stack->count != 1) {
+        LOG_ERROR("Invalid Expression");
+        return -1;
+    }
+    *nfa = *stack_pop(nfa_stack).nfa;
     stack_destroy(nfa_stack);
-    stack_destroy(nfa_operator_stack);
-    return result;
+    stack_destroy(nfa_op_stack);
+
+    return 0;
 }

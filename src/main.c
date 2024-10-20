@@ -39,7 +39,7 @@ int main(void) {
         expected = test.match;
         actual = nfa_match(nfa, test.text);
 
-        printf("%s\texpected: %s\tactual %s\t", test.text,
+        printf("%s\texpected: %s\tactual: %s\t", test.text,
                BOOL_TO_STR(expected), BOOL_TO_STR(actual));
         if (actual == expected) {
             printf(ANSI_FG_GREEN "PASSED" ANSI_RESET "\n");
