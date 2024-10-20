@@ -33,3 +33,16 @@ void state_append_transition(State *from, State *to, char symbol) {
     from->transitions[(int)symbol] = to;
     from->transitions_count++;
 }
+
+void state_copy(State *dest, State *src) {
+    dest->epsilon_transitions =
+        realloc(src->epsilon_transitions,
+                src->epsilon_transitions_count * sizeof(State *));
+    if (!dest->epsilon_transitions) {
+        LOG_ERROR_HEAP_ALLOC("dest->epsilon_transitions");
+        return;
+    }
+    dest->epsilon_transitions_count = src->epsilon_transitions_count;
+    memcpy(dest->transitions, src->transitions, sizeof(src->transitions));
+    dest->transitions_count = src->epsilon_transitions_count;
+}
