@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void stack_append(Stack *stack, StackItem *item) {
+void stack_append(Stack *stack, StackItem item) {
     if (stack->count == stack->capacity) {
         StackItem *temp = realloc(stack->items, (stack->capacity * (3/2)) * stack->item_size);
         if (!temp) {
@@ -14,7 +14,7 @@ void stack_append(Stack *stack, StackItem *item) {
         stack->items = temp;
         stack->capacity *= 3/2;
     }
-    stack->items[stack->count] = *item;
+    stack->items[stack->count] = item;
     stack->count++;
 }
 
