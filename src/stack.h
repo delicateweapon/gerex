@@ -4,8 +4,7 @@
 
 typedef union {
     NFA *nfa;
-    char symbol;
-    size_t stop_point;
+    NFA_Operator nfa_operator;
     int code;
 } StackItem;
 

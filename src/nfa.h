@@ -25,6 +25,13 @@ NFA *nfa_create(void);
 NFA *nfa_from_symbol(char symbol);
 void nfa_destroy(NFA *nfa);
 
+typedef enum {
+    NFA_OPERATOR_LPAREN,
+    NFA_OPERATOR_CLOSURE,
+    NFA_OPERATOR_CONCAT,
+    NFA_OPERATOR_UNION,
+} NFA_Operator;
+
 NFA *nfa_closure(NFA *nfa);
 NFA *nfa_concat(NFA *nfa1, NFA *nfa2);
 NFA *nfa_concat_multiple(size_t count, ...);

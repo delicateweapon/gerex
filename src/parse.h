@@ -2,4 +2,4 @@
 
 #include "nfa.h"
 
-NFA *parse_regex_to_nfa(const char *regex);
+NFA parse_regex_to_nfa(const char *regex);
