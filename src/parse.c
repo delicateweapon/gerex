@@ -11,6 +11,7 @@ NFA *parse_regex_to_nfa(const char *regex) {
     StackItem s_item;
 
     Stack *nfa_stack = stack_create(sizeof(NFA *), 16);
+    Stack *stop_points = stack_create(sizeof(size_t), 8);
     Stack *symbol_stack = stack_create(sizeof(char), 16);
 
     i = 0;
@@ -19,6 +20,8 @@ NFA *parse_regex_to_nfa(const char *regex) {
     while (c != '\0') {
         switch (c) {
         case '(':
+            s_item.stop_point = nfa_stack->count;
+            stack_append(stop_points, s_item);
             break;
         case ')':
             break;
@@ -32,5 +35,6 @@ NFA *parse_regex_to_nfa(const char *regex) {
 
         c = regex[++i];
     }
+
     return stack_view_top(nfa_stack).nfa;
 }
