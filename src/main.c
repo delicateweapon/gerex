@@ -10,13 +10,15 @@ struct test_case {
 };
 
 int main(void) {
-    // regex: ab*c
-    NFA *nfa = nfa_concat_multiple(3, nfa_from_symbol('a'),
-                                   nfa_closure(nfa_from_symbol('b')),
-                                   nfa_from_symbol('c'));
+    // regex: a(b|e)*c
+    NFA *nfa = nfa_concat_multiple(
+        3, nfa_from_symbol('a'),
+        nfa_closure(nfa_union(nfa_from_symbol('b'), nfa_from_symbol('e'))),
+        nfa_from_symbol('c'));
     const struct test_case test_cases[] = {
-        {"abc", true},   {"ac", true},     {"abbbbc", true},
-        {"bbbc", false}, {"abbbb", false}, {"abcd", false}};
+        {"abebec", true}, {"abc", true},    {"ac", true},    {"abbbbc", true},
+        {"bbbc", false},  {"abbbb", false}, {"abcd", false}, {"aeeec", true},
+    };
 
     size_t test_count = ARRAY_SIZE(test_cases);
     bool expected;

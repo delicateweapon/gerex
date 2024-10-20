@@ -1,8 +1,8 @@
 #include "nfa.h"
 #include "util.h"
 
-#include <stdio.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 NFA *nfa_closure(NFA *nfa) {
     NFA *result = nfa_create();
@@ -50,6 +50,28 @@ NFA *nfa_concat_multiple(size_t count, ...) {
     return result;
 }
 
+NFA *nfa_concat_array(size_t count, NFA **nfas) {
+    if (count < 2) {
+        LOG_ERROR("count must be greater than 2");
+        return NULL;
+    }
+
+    NFA *nfa1, *nfa2;
+    nfa1 = nfas[0];
+
+    NFA *result = nfa_create();
+    result->state_start = nfa1->state_start;
+
+    for (size_t i = 1; i < count; ++i) {
+        nfa2 = nfas[i];
+        nfa_concat(nfa1, nfa2);
+        nfa1 = nfa2;
+    }
+
+    result->state_end = nfa1->state_end;
+    return result;
+}
+
 NFA *nfa_union(NFA *nfa1, NFA *nfa2) {
     NFA *result = nfa_create();
     state_append_epsilon_transition(result->state_start, nfa1->state_start);
@@ -78,5 +100,23 @@ NFA *nfa_union_multiple(size_t count, ...) {
     }
 
     va_end(args);
+    return result;
+}
+
+NFA *nfa_union_array(size_t count, NFA **nfas) {
+    if (count < 2) {
+        LOG_ERROR("count must be greater than 2");
+        return NULL;
+    }
+
+    NFA *result = nfa_create();
+    NFA *nfa;
+
+    for (size_t i = 0; i < count; ++i) {
+        nfa = nfas[i];
+        state_append_epsilon_transition(result->state_start, nfa->state_start);
+        state_append_epsilon_transition(nfa->state_end, result->state_end);
+    }
+
     return result;
 }

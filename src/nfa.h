@@ -1,8 +1,8 @@
 #pragma once
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdbool.h>
 
 typedef struct state {
     struct state **epsilon_transitions;
@@ -28,7 +28,9 @@ void nfa_destroy(NFA *nfa);
 NFA *nfa_closure(NFA *nfa);
 NFA *nfa_concat(NFA *nfa1, NFA *nfa2);
 NFA *nfa_concat_multiple(size_t count, ...);
+NFA *nfa_concat_array(size_t count, NFA **nfas);
 NFA *nfa_union(NFA *nfa1, NFA *nfa2);
 NFA *nfa_union_multiple(size_t count, ...);
+NFA *nfa_union_array(size_t count, NFA **nfas);
 
 bool nfa_match(NFA *nfa, const char *text);
