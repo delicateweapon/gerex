@@ -50,5 +50,33 @@ NFA *nfa_concat_multiple(size_t count, ...) {
     return result;
 }
 
-NFA *nfa_union(NFA *nfa1, NFA *nfa2);
-NFA *nfa_union_multiple(size_t count, ...);
+NFA *nfa_union(NFA *nfa1, NFA *nfa2) {
+    NFA *result = nfa_create();
+    state_append_epsilon_transition(result->state_start, nfa1->state_start);
+    state_append_epsilon_transition(nfa1->state_end, result->state_end);
+    state_append_epsilon_transition(result->state_start, nfa2->state_start);
+    state_append_epsilon_transition(nfa2->state_end, result->state_end);
+    return result;
+}
+
+NFA *nfa_union_multiple(size_t count, ...) {
+    if (count < 2) {
+        LOG_ERROR("count must be greater than 2");
+        return NULL;
+    }
+
+    va_list args;
+    va_start(args, count);
+
+    NFA *result = nfa_create();
+    NFA *nfa;
+
+    for (size_t i = 0; i < count; ++i) {
+        nfa = va_arg(args, NFA *);
+        state_append_epsilon_transition(result->state_start, nfa->state_start);
+        state_append_epsilon_transition(nfa->state_end, result->state_end);
+    }
+
+    va_end(args);
+    return result;
+}
