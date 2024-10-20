@@ -14,6 +14,11 @@ NFA *nfa_create(void) {
     return nfa;
 }
 
+NFA *nfa_from_symbol(char symbol) {
+    NFA *nfa = nfa_create();
+    state_append_transition(nfa->state_start, nfa->state_end, symbol);
+    return nfa;
+}
 
 void nfa_destroy(NFA *nfa) {
     (void)nfa;

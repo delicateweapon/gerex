@@ -12,7 +12,7 @@ State *state_create(void) {
         return NULL;
     }
     state->epsilon_transitions = NULL;
-    memset(state->transitions, NULL, sizeof(state->transitions));
+    memset(state->transitions, 0, sizeof(state->transitions));
     return state;
 }
 

@@ -6,6 +6,9 @@
 #define MAX(a, b) (a) > (b) ? (a) : (b)
 #define CLAMP(v, a, b) ((v) < (a)) ? (a) : (((v) > (b)) ? (b) : (v))
 
+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
+#define BOOL_TO_STR(v) (v ? "true" : "false")
+
 #define LOG_ERROR(message)                                                     \
     fprintf(stderr, "[" ANSI_FG_RED "ERROR" ANSI_RESET "] %s (%s)\n", message, \
             __func__);

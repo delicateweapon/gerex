@@ -22,6 +22,7 @@ typedef struct {
 } NFA;
 
 NFA *nfa_create(void);
+NFA *nfa_from_symbol(char symbol);
 void nfa_destroy(NFA *nfa);
 
 NFA *nfa_closure(NFA *nfa);
@@ -29,3 +30,5 @@ NFA *nfa_concat(NFA *nfa1, NFA *nfa2);
 NFA *nfa_concat_multiple(size_t count, ...);
 NFA *nfa_union(NFA *nfa1, NFA *nfa2);
 NFA *nfa_union_multiple(size_t count, ...);
+
+bool nfa_match(NFA *nfa, const char *text);
