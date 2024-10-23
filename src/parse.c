@@ -9,7 +9,8 @@
 Stack *nfa_stack;
 Stack *nfa_op_stack;
 StackItem item;
-StackItem top;
+StackItem top_nfa;
+StackItem top_op;
 
 static inline void stacks_initialize(void) {
     nfa_stack = stack_create(sizeof(NFA *), 16);
@@ -24,28 +25,28 @@ static int precedence[] = {
 
 static inline void nfa_op_stack_collapse(NFA_Operator op) {
     while (nfa_op_stack->count > 0) {
-        top = stack_view_top(nfa_op_stack);
-        if (precedence[top.nfa_operator] < precedence[op]) {
+        top_op = stack_view_top(nfa_op_stack);
+        if (precedence[top_op.nfa_operator] < precedence[op]) {
             break;
         }
         stack_pop(nfa_op_stack);
         NFA *nfa1, *nfa2;
-        switch (top.nfa_operator) {
+        switch (top_op.nfa_operator) {
         case NFA_OPERATOR_CLOSURE:
-            item.nfa = nfa_closure(stack_pop(nfa_stack).nfa);
-            stack_append(nfa_stack, item);
+            top_nfa.nfa = nfa_closure(stack_pop(nfa_stack).nfa);
+            stack_append(nfa_stack, top_nfa);
             break;
         case NFA_OPERATOR_CONCAT:
             nfa1 = stack_pop(nfa_stack).nfa;
             nfa2 = stack_pop(nfa_stack).nfa;
-            item.nfa = nfa_concat(nfa2, nfa1);
-            stack_append(nfa_stack, item);
+            top_nfa.nfa = nfa_concat(nfa2, nfa1);
+            stack_append(nfa_stack, top_nfa);
             break;
         case NFA_OPERATOR_UNION:
             nfa1 = stack_pop(nfa_stack).nfa;
             nfa2 = stack_pop(nfa_stack).nfa;
-            item.nfa = nfa_union(nfa1, nfa2);
-            stack_append(nfa_stack, item);
+            top_nfa.nfa = nfa_union(nfa1, nfa2);
+            stack_append(nfa_stack, top_nfa);
             break;
         default:
             // the precedence order wont allow for anything else
@@ -65,7 +66,7 @@ int parse_regex_to_nfa(NFA *nfa, const char *regex) {
         switch (c) {
         case ')':
             nfa_op_stack_collapse(item.nfa_operator);
-            if (top.nfa_operator != NFA_OPERATOR_LPAREN) {
+            if (top_op.nfa_operator != NFA_OPERATOR_LPAREN) {
                 LOG_ERROR("Invalid expression");
                 return -1;
             }
@@ -79,7 +80,7 @@ int parse_regex_to_nfa(NFA *nfa, const char *regex) {
             item.nfa_operator = NFA_OPERATOR_CLOSURE;
             nfa_op_stack_collapse(item.nfa_operator);
             stack_append(nfa_op_stack, item);
-            append_concat = false;
+            append_concat = true;
             break;
 
         case '|':
@@ -107,6 +108,8 @@ int parse_regex_to_nfa(NFA *nfa, const char *regex) {
         }
         c = regex[++i];
     }
+
+    nfa_op_stack_collapse(0);
 
     if (nfa_stack->count != 1) {
         LOG_ERROR("Invalid Expression");
