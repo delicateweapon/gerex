@@ -23,10 +23,7 @@ static int precedence[] = {
 };
 
 static inline void nfa_op_stack_collapse(NFA_Operator op) {
-    if (nfa_op_stack->count != 0) {
-        return;
-    }
-    do {
+    while (nfa_op_stack->count > 0) {
         top = stack_view_top(nfa_op_stack);
         if (precedence[top.nfa_operator] < precedence[op]) {
             break;
@@ -54,7 +51,7 @@ static inline void nfa_op_stack_collapse(NFA_Operator op) {
             // the precedence order wont allow for anything else
             break;
         }
-    } while (nfa_op_stack->count > 0);
+    }
 }
 
 int parse_regex_to_nfa(NFA *nfa, const char *regex) {
