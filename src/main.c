@@ -22,12 +22,17 @@ int main(void) {
     //     {"bbbc", false},  {"abbbb", false}, {"abcd", false}, {"aeeec", true},
     // };
 
-    // regex ab*c
     NFA nfa;
-    parse_regex_to_nfa(&nfa, "ab*c");
+    // parse_regex_to_nfa(&nfa, "ab*c");
+    // const struct test_case test_cases[] = {
+    //     {"abc", true},   {"ac", true},     {"abbbbc", true},
+    //     {"bbbc", false}, {"abbbb", false}, {"abcd", false},
+    // };
+
+    parse_regex_to_nfa(&nfa, "(a|b)*c");
     const struct test_case test_cases[] = {
-        {"abc", true},   {"ac", true},     {"abbbbc", true},
-        {"bbbc", false}, {"abbbb", false}, {"abcd", false},
+        {"ababababbac", true},   {"aaabbbc", true},     {"ab", false},
+        {"bbb", false}, {"c", true}, {"aac", true},
     };
 
     size_t test_count = ARRAY_SIZE(test_cases);

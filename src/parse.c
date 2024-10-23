@@ -64,12 +64,25 @@ int parse_regex_to_nfa(NFA *nfa, const char *regex) {
     while (c != '\0') {
 
         switch (c) {
+        case '(':
+            if (append_concat) {
+                item.nfa_operator = NFA_OPERATOR_CONCAT;
+                nfa_op_stack_collapse(item.nfa_operator);
+                stack_append(nfa_op_stack, item);
+                append_concat = false;
+            }
+            item.nfa_operator = NFA_OPERATOR_LPAREN;
+            stack_append(nfa_op_stack, item);
+            break;
+
         case ')':
-            nfa_op_stack_collapse(item.nfa_operator);
+            nfa_op_stack_collapse(NFA_OPERATOR_RPAREN);
             if (top_op.nfa_operator != NFA_OPERATOR_LPAREN) {
                 LOG_ERROR("Invalid expression");
                 return -1;
             }
+            stack_pop(nfa_op_stack); // removal of LPAREN
+            append_concat = true;
             break;
 
         case '*':
