@@ -11,6 +11,11 @@ Stack *nfa_op_stack;
 StackItem item;
 StackItem top;
 
+static inline void stacks_initialize(void) {
+    nfa_stack = stack_create(sizeof(NFA *), 16);
+    nfa_op_stack = stack_create(sizeof(NFA_Operator), 16);
+}
+
 static int precedence[] = {
     [NFA_OPERATOR_LPAREN] = 0,  [NFA_OPERATOR_RPAREN] = 0,
     [NFA_OPERATOR_UNION] = 1,   [NFA_OPERATOR_CONCAT] = 2,
@@ -49,13 +54,14 @@ static inline void nfa_op_stack_collapse(NFA_Operator op) {
             // the precedence order wont allow for anything else
             break;
         }
-    } while (nfa_op_stack->count == 0);
+    } while (nfa_op_stack->count > 0);
 }
 
 int parse_regex_to_nfa(NFA *nfa, const char *regex) {
     size_t i = 0;
     char c = regex[i];
     bool append_concat = false;
+    stacks_initialize();
 
     while (c != '\0') {
 
