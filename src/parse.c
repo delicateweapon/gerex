@@ -26,26 +26,32 @@ static int precedence[] = {
 static inline void nfa_op_stack_collapse(NFA_Operator op) {
     while (nfa_op_stack->count > 0) {
         top_op = stack_view_top(nfa_op_stack);
-        if (precedence[top_op.nfa_operator] < precedence[op]) {
+        if (precedence[top_op.nfa_operator] <= precedence[op]) {
             break;
         }
-        stack_pop(nfa_op_stack);
-        NFA *nfa1, *nfa2;
         switch (top_op.nfa_operator) {
         case NFA_OPERATOR_CLOSURE:
             top_nfa.nfa = nfa_closure(stack_pop(nfa_stack).nfa);
             stack_append(nfa_stack, top_nfa);
+            stack_pop(nfa_op_stack);
             break;
         case NFA_OPERATOR_CONCAT:
+            NFA *nfa1, *nfa2;
             nfa1 = stack_pop(nfa_stack).nfa;
             nfa2 = stack_pop(nfa_stack).nfa;
             top_nfa.nfa = nfa_concat(nfa2, nfa1);
             stack_append(nfa_stack, top_nfa);
+            stack_pop(nfa_op_stack);
             break;
         case NFA_OPERATOR_UNION:
-            nfa1 = stack_pop(nfa_stack).nfa;
-            nfa2 = stack_pop(nfa_stack).nfa;
-            top_nfa.nfa = nfa_union(nfa1, nfa2);
+            Stack *nfas = stack_create(sizeof(NFA *), 8);
+            stack_append(nfas, stack_pop(nfa_stack));
+            while (top_op.nfa_operator == NFA_OPERATOR_UNION) {
+                stack_pop(nfa_op_stack);
+                stack_append(nfas, stack_pop(nfa_stack));
+                top_op = stack_view_top(nfa_op_stack);
+            }
+            top_nfa.nfa = nfa_union_array(nfas->count, (NFA **)nfas->items);
             stack_append(nfa_stack, top_nfa);
             break;
         default:
@@ -62,7 +68,6 @@ int parse_regex_to_nfa(NFA *nfa, const char *regex) {
     stacks_initialize();
 
     while (c != '\0') {
-
         switch (c) {
         case '(':
             if (append_concat) {

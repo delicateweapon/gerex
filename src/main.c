@@ -31,8 +31,8 @@ int main(void) {
 
     parse_regex_to_nfa(&nfa, "(a|b)*c");
     const struct test_case test_cases[] = {
-        {"ababababbac", true},   {"aaabbbc", true},     {"ab", false},
-        {"bbb", false}, {"c", true}, {"aac", true},
+        {"ababababbac", true}, {"aaabbbc", true}, {"ab", false},
+        {"bbb", false},        {"c", true},       {"aac", true},
     };
 
     size_t test_count = ARRAY_SIZE(test_cases);
