@@ -6,9 +6,10 @@
 #include <ctype.h>
 #include <stdio.h>
 
-static Stack *nfa_stack;
-static Stack *nfa_op_stack;
-static StackItem item;
+Stack *nfa_stack;
+Stack *nfa_op_stack;
+StackItem item;
+StackItem top;
 
 static int precedence[] = {
     [NFA_OPERATOR_LPAREN] = 0,  [NFA_OPERATOR_RPAREN] = 0,
@@ -16,39 +17,39 @@ static int precedence[] = {
     [NFA_OPERATOR_CLOSURE] = 3,
 };
 
-static StackItem top;
 static inline void nfa_op_stack_collapse(NFA_Operator op) {
     if (nfa_op_stack->count != 0) {
-        do {
-            top = stack_view_top(nfa_op_stack);
-            if (precedence[top.nfa_operator] < precedence[op]) {
-                break;
-            }
-            stack_pop(nfa_op_stack);
-            NFA *nfa1, *nfa2;
-            switch (top.nfa_operator) {
-            case NFA_OPERATOR_CLOSURE:
-                item.nfa = nfa_closure(stack_pop(nfa_stack).nfa);
-                stack_append(nfa_stack, item);
-                break;
-            case NFA_OPERATOR_CONCAT:
-                nfa1 = stack_pop(nfa_stack).nfa;
-                nfa2 = stack_pop(nfa_stack).nfa;
-                item.nfa = nfa_concat(nfa2, nfa1);
-                stack_append(nfa_stack, item);
-                break;
-            case NFA_OPERATOR_UNION:
-                nfa1 = stack_pop(nfa_stack).nfa;
-                nfa2 = stack_pop(nfa_stack).nfa;
-                item.nfa = nfa_union(nfa1, nfa2);
-                stack_append(nfa_stack, item);
-                break;
-            default:
-                // the precedence order wont allow for anything else
-                break;
-            }
-        } while (nfa_op_stack->count == 0);
+        return;
     }
+    do {
+        top = stack_view_top(nfa_op_stack);
+        if (precedence[top.nfa_operator] < precedence[op]) {
+            break;
+        }
+        stack_pop(nfa_op_stack);
+        NFA *nfa1, *nfa2;
+        switch (top.nfa_operator) {
+        case NFA_OPERATOR_CLOSURE:
+            item.nfa = nfa_closure(stack_pop(nfa_stack).nfa);
+            stack_append(nfa_stack, item);
+            break;
+        case NFA_OPERATOR_CONCAT:
+            nfa1 = stack_pop(nfa_stack).nfa;
+            nfa2 = stack_pop(nfa_stack).nfa;
+            item.nfa = nfa_concat(nfa2, nfa1);
+            stack_append(nfa_stack, item);
+            break;
+        case NFA_OPERATOR_UNION:
+            nfa1 = stack_pop(nfa_stack).nfa;
+            nfa2 = stack_pop(nfa_stack).nfa;
+            item.nfa = nfa_union(nfa1, nfa2);
+            stack_append(nfa_stack, item);
+            break;
+        default:
+            // the precedence order wont allow for anything else
+            break;
+        }
+    } while (nfa_op_stack->count == 0);
 }
 
 int parse_regex_to_nfa(NFA *nfa, const char *regex) {

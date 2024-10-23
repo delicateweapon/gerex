@@ -23,8 +23,8 @@ int main(void) {
     // };
 
     // regex ab*c
-    NFA nfa_np = parse_regex_to_nfa("ab*c");
-    NFA *nfa = &nfa_np;
+    NFA nfa;
+    parse_regex_to_nfa(&nfa, "ab*c");
     const struct test_case test_cases[] = {
         {"abc", true},   {"ac", true},     {"abbbbc", true},
         {"bbbc", false}, {"abbbb", false}, {"abcd", false},
@@ -37,7 +37,7 @@ int main(void) {
     for (size_t i = 0; i < test_count; ++i) {
         test = test_cases[i];
         expected = test.match;
-        actual = nfa_match(nfa, test.text);
+        actual = nfa_match(&nfa, test.text);
 
         printf("%s\texpected: %s\tactual: %s\t", test.text,
                BOOL_TO_STR(expected), BOOL_TO_STR(actual));
