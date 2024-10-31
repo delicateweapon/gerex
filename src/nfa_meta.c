@@ -8,6 +8,7 @@ NFA *nfa_create(void) {
     NFA *nfa = malloc(sizeof(*nfa));
     if (nfa == NULL) {
         LOG_ERROR_HEAP_ALLOC("nfa");
+        return NULL;
     }
     nfa->start = state_create();
     nfa->end = state_create();

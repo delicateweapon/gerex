@@ -14,7 +14,7 @@ int main(void) {
       nfa_concat(nfa_from_symbol('a'), nfa_apply_closure(nfa_from_symbol('b'))),
       nfa_from_symbol('c'));
 
-  nfa_debug_print(nfa);
+  // nfa_debug_print(nfa);
 
   printf("%s\n", BOOL_TO_STR(nfa_match(nfa, text)));
 

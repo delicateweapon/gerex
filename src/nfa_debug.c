@@ -1,9 +1,9 @@
 #include "nfa.h"
 
-#ifdef debug
-
 #include <stdio.h>
 #include <string.h>
+
+#ifdef debug
 
 bool *printed_id;
 bool *recursed_id;

@@ -9,6 +9,7 @@ State *state_create(void) {
   State *state = malloc(sizeof(*state));
   if (state == NULL) {
     LOG_ERROR_HEAP_ALLOC("state");
+    return NULL;
   }
   state->eps_moves = NULL;
   state->eps_count = 0;
