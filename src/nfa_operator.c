@@ -16,11 +16,12 @@ NFA *nfa_apply_closure(NFA *nfa) {
 }
 
 NFA *nfa_concat(NFA *nfa1, NFA *nfa2) {
-  NFA *result = nfa_create();
-
-  result->start = nfa1->start;
   state_copy(nfa1->end, nfa2->start);
   nfa2->start = nfa1->end;
+
+  NFA *result = nfa_create();
+  result->start = nfa1->start;
+  result->end = nfa2->end;
 
   return result;
 }

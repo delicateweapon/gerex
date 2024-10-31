@@ -6,6 +6,7 @@
 #include <string.h>
 
 bool *printed_id;
+bool *recursed_id;
 size_t n;
 State *maybe;
 
@@ -42,6 +43,10 @@ static inline void state_debug_print(State *state) {
 }
 
 static inline void state_debug_print_recurse(State *state) {
+  if (recursed_id[state->id] == true) {
+    return;
+  }
+  recursed_id[state->id] = true;
   state_debug_print(state);
   for (size_t i = 0; i < state->eps_count; ++i) {
     state_debug_print_recurse(state->eps_moves[i]);
@@ -64,9 +69,12 @@ static inline void state_debug_print_recurse(State *state) {
 
 void nfa_debug_print(NFA *nfa) {
   bool printed_id_runtime[state_id];
+  bool recursed_id_runtime[state_id];
   memset(printed_id_runtime, false, sizeof(printed_id_runtime));
+  memset(recursed_id_runtime, false, sizeof(recursed_id_runtime));
 
   printed_id = printed_id_runtime;
+  recursed_id = recursed_id_runtime;
   state_debug_print_recurse(nfa->start);
 }
 
