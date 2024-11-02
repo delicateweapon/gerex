@@ -234,7 +234,7 @@ NFA *NFA::parse_from_string(std::string &expr) {
       break;
 
     case '(':
-      NFA::ops_collapse(op::LPAREN);
+      // NFA::ops_collapse(op::LPAREN);
       if (push_concat) {
         NFA::ops_collapse(op::CONCAT);
         NFA::ops.push_back(op::CONCAT);
