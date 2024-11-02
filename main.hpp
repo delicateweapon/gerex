@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 class NFA {
@@ -9,21 +8,28 @@ public:
   class State {
   public:
     std::vector<State *> eps_moves;
-    std::unordered_map<char, State *> moves;
+    char symbol;
+    State *symbol_next;
     size_t id;
 
     State(void);
 
     void add_eps_move(State *next);
+    void print(void);
+    void print_recurse(void);
 
     static std::size_t count;
     static std::size_t eps_moves_count;
+
+  private:
+      bool printed;
+      bool recurse_printed;
   };
 
   State *start;
   State *end;
 
-  NFA(void);
+  NFA(bool init_state);
   NFA(char symbol);
 
   enum op : int {
@@ -41,6 +47,10 @@ public:
   static NFA *form_concat(NFA *nfa1, NFA *nfa2);
 
   static NFA *parse_from_string(std::string &expr);
+
+  static void reset_counts(void);
+
+  void print(void);
 
 private:
   static std::vector<NFA *> nfas;
