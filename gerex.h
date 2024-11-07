@@ -6,6 +6,8 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include <cstdint>
+#include <algorithm>
 
 class NFA {
 public:
