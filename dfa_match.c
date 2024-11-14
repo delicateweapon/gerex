@@ -2,7 +2,7 @@
 
 bool DFA_match(DFA *dfa, const char *text)
 {
-    DFA_State *state;
+    DFA_State *state, *temp;
     DFA_Move *move;
     size_t i, j;
     char c;
@@ -10,6 +10,7 @@ bool DFA_match(DFA *dfa, const char *text)
     state = dfa->begin;
     c = text[i = 0];
     while (c != '\0') {
+        temp = state;
         j = 0;
         while (j < state->moves_count) {
             move = &(state->moves[j]);
@@ -21,7 +22,7 @@ bool DFA_match(DFA *dfa, const char *text)
             j++;
         }
 
-        if (j == state->moves_count) {
+        if (temp == state) {
             return false;
         }
     }

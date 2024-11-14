@@ -14,7 +14,9 @@ NFA_State *NFA_State_find_symbol_next(NFA_State *state, char symbol)
         if (move->symbol == symbol) {
             return move->next;
         }
-        return NULL;
+        if (move->symbol != SYMBOL_EPSILON) {
+            return NULL;
+        }
     }
 
     for (size_t i = 0; i < state->moves_count; ++i) {

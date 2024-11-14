@@ -67,7 +67,7 @@ DFA *DFA_construct(NFA *nfa)
             size_t k = considered_nfa_states_count;
             do {
                 --k;
-                if (next == considered_nfa_states[j]) {
+                if (next == considered_nfa_states[k]) {
                     found = true;
                     break;
                 }
@@ -76,7 +76,7 @@ DFA *DFA_construct(NFA *nfa)
             if (found) {
                 DFA_State_move_add(
                     context_dfa,
-                    g_DFA_States[j],
+                    g_DFA_States[k],
                     symbol);
             } else {
                 considered_nfa_states[considered_nfa_states_count++] = next;
