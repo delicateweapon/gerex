@@ -14,8 +14,10 @@ int main(void)
     while (1) {
         printf(">>> ");
         scanf("%s %s", expr, text);
+
         pthread_create(&g_regex_thread, NULL, regex_func, NULL);
         pthread_join(g_regex_thread, NULL);
+
         allocations_free_all();
         globals_reset();
     }

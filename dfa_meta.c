@@ -55,21 +55,23 @@ DFA *DFA_construct(NFA *nfa)
         context_nfa = considered_nfa_states[i];
         context_dfa = g_DFA_States[i];
 
-        for (size_t i = 0; i < g_symbols_count; ++i) {
-            next = NFA_State_find_symbol_next(context_nfa, g_symbols[i]);
+        for (size_t j = 0; j < g_symbols_count; ++j) {
+            symbol = g_symbols[j];
+
+            next = NFA_State_find_symbol_next(context_nfa, symbol);
             if (!next) {
                 continue;
             }
 
             bool found = false;
-            size_t j = considered_nfa_states_count;
+            size_t k = considered_nfa_states_count;
             do {
-                --j;
+                --k;
                 if (next == considered_nfa_states[j]) {
                     found = true;
                     break;
                 }
-            } while (j > 0);
+            } while (k > 0);
 
             if (found) {
                 DFA_State_move_add(

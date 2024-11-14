@@ -50,7 +50,7 @@ static void ops_collapse(NFA_Op op)
             }
             nfa1 = nfas[--nfas_count];
             nfa2 = nfas[--nfas_count];
-            nfas[nfas_count++] = NFA_union(nfa2, nfa1);
+            nfas[nfas_count++] = NFA_concat(nfa2, nfa1);
             break;
 
         case CLOSURE:
