@@ -91,6 +91,6 @@ typedef struct {
 } DFA;
 
 DFA *DFA_construct(NFA *nfa);
-bool DFA_match(const char *text);
+bool DFA_match(DFA *dfa, const char *text);
 
 void globals_reset(void);

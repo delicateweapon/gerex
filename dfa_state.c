@@ -19,7 +19,8 @@ DFA_State *DFA_State_create(void)
 
     result->id = g_DFA_State_count;
     result->moves = malloc(sizeof(DFA_Move) * g_symbols_count);
-    g_allocations[g_allocations_count++] = result->moves;
+    /* this causes double free */
+    /* g_allocations[g_allocations_count++] = result->moves; */
     result->moves_count = 0;
 
     g_DFA_States[g_DFA_State_count++] = result;
