@@ -10,6 +10,7 @@ NFA_State *NFA_State_create(void)
     NFA_State *result;
 
     result = malloc(sizeof(*result));
+    allocations[allocations_count++] = result;
     if (!result) {
         fprintf(stderr, "malloc error: %s\n", __func__);
         pthread_exit(NULL);
@@ -28,6 +29,7 @@ NFA *NFA_create(bool state_init)
     NFA *result;
 
     result = malloc(sizeof(*result));
+    allocations[allocations_count++] = result;
     if (!result) {
         fprintf(stderr, "malloc error: %s\n", __func__);
         pthread_exit(NULL);

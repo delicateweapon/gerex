@@ -3,6 +3,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define MAX_ALLOCATIONS (1 << 8)
+extern void *allocations[MAX_ALLOCATIONS];
+extern size_t allocations_count;
+
+void allocations_free_all(void);
+
 extern pthread_t g_regex_thread;
 
 struct nfa_state;

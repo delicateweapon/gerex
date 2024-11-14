@@ -20,6 +20,7 @@ int main(void)
         scanf("%s", expr);
         pthread_create(&g_regex_thread, NULL, regex_func, expr);
         pthread_join(g_regex_thread, NULL);
+        allocations_free_all();
     }
     return 0;
 }
