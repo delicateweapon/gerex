@@ -26,4 +26,19 @@ DFA_State *DFA_State_create(void)
     return result;
 }
 
-DFA_State DFA_State_move_add(DFA_State *state, DFA_State *next, char symbol);
+void DFA_State_move_add(DFA_State *state, DFA_State *next, char symbol)
+{
+    DFA_Move *temp;
+    temp = realloc(state->moves, sizeof(NFA_Move) * (state->moves_count + 1));
+    if (!temp) {
+        fprintf(stderr, "realloc error: %s\n", __func__);
+        pthread_exit(NULL);
+    }
+
+    state->moves = temp;
+    state->moves[state->moves_count] = (DFA_Move) {
+        .next = next,
+        .symbol = symbol,
+    };
+    state->moves_count++;
+}

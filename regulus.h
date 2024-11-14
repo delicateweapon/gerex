@@ -65,7 +65,7 @@ struct dfa_state;
 
 typedef struct {
     struct dfa_state *next;
-    char sym;
+    char symbol;
 } DFA_Move;
 
 typedef struct dfa_state {
@@ -79,7 +79,7 @@ extern DFA_State *g_DFA_States[MAX_DFA_STATES];
 extern size_t g_DFA_State_count;
 
 DFA_State *DFA_State_create(void);
-DFA_State DFA_State_move_add(DFA_State *state, DFA_State *next, char symbol);
+void DFA_State_move_add(DFA_State *state, DFA_State *next, char symbol);
 
 typedef struct {
     DFA_State *begin;
