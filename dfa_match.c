@@ -16,15 +16,16 @@ bool DFA_match(DFA *dfa, const char *text)
             if (move->symbol == c) {
                 state = move->next;
                 c = text[++i];
-                goto end_check;
+                break;
             }
             j++;
         }
 
-        return false;
+        if (j == state->moves_count) {
+            return false;
+        }
     }
 
-end_check:
     for (i = 0; i < dfa->ends_count; ++i) {
         if (state == dfa->ends[i]) {
             return true;
