@@ -1,9 +1,11 @@
 #include "regulus.h"
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 size_t g_NFA_State_count = 0;
+char g_symbols[MAX_SYMBOLS];
+size_t g_symbols_count = 0;
 
 NFA_State *NFA_State_create(void)
 {
@@ -48,6 +50,8 @@ NFA *NFA_create(bool state_init)
 
 inline NFA *NFA_from_symbol(char symbol)
 {
+    g_symbols[g_symbols_count++] = symbol;
+
     NFA *result = NFA_create(true);
     NFA_State_move_add(result->begin, result->end, symbol);
     return result;

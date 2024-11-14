@@ -14,6 +14,10 @@ extern pthread_t g_regex_thread;
 struct nfa_state;
 #define SYMBOL_EPSILON 0
 
+#define MAX_SYMBOLS (1 << 4)
+extern char g_symbols[MAX_SYMBOLS];
+extern size_t g_symbols_count;
+
 typedef struct {
     struct nfa_state *next;
     char symbol;
@@ -70,7 +74,12 @@ typedef struct dfa_state {
     size_t moves_count;
 } DFA_State;
 
+#define MAX_DFA_STATES (1 << 6)
+extern DFA_State *g_DFA_States[MAX_DFA_STATES];
 extern size_t g_DFA_State_count;
+
+DFA_State *DFA_State_create(void);
+DFA_State DFA_State_move_add(DFA_State *state, DFA_State *next, char symbol);
 
 typedef struct {
     DFA_State *begin;
