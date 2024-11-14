@@ -17,7 +17,7 @@ int main(void)
 
     while (1) {
         printf(">>> ");
-        scanf("%s\n", expr);
+        scanf("%s", expr);
         pthread_create(&g_regex_thread, NULL, regex_func, expr);
         pthread_join(g_regex_thread, NULL);
     }

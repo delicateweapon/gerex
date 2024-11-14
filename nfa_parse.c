@@ -14,7 +14,7 @@ size_t ops_count;
 static NFA_Op top;
 static NFA *nfa1, *nfa2;
 
-static inline void ops_collapse(NFA_Op op)
+static void ops_collapse(NFA_Op op)
 {
     if (ops_count == 0) {
         return;
@@ -24,10 +24,10 @@ static inline void ops_collapse(NFA_Op op)
     while (NFA_Op_precedence(top) >= NFA_Op_precedence(op)) {
         ops_count--;
 
-        switch (op) {
+        switch (top) {
         case LPAREN:
         case RPAREN:
-            /* Not happeniong */
+            /* is any code needed for this case? no i dont think so */
             break;
 
          case UNION:
@@ -77,6 +77,7 @@ NFA *NFA_parse(const char *expr)
     size_t i;
     char c;
     bool append_concat;
+    bool treat_as_symbol;
 
     append_concat = false;
     c = expr[i = 0];
@@ -88,6 +89,19 @@ NFA *NFA_parse(const char *expr)
             }
             nfas[nfas_count++] = NFA_from_symbol(c);
 
+            append_concat = true;
+            c = expr[++i];
+            continue;
+        }
+
+        if (treat_as_symbol) {            
+            if (append_concat) {
+                ops_collapse(CONCAT);
+                ops[ops_count++] = CONCAT;
+            }
+            nfas[nfas_count++] = NFA_from_symbol(c);
+
+            treat_as_symbol = false;
             append_concat = true;
             c = expr[++i];
             continue;
@@ -127,6 +141,10 @@ NFA *NFA_parse(const char *expr)
             }
 
             append_concat = true;
+            break;
+
+        case '\\':
+            treat_as_symbol = true;
             break;
         }
 

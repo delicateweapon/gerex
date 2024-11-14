@@ -6,7 +6,7 @@
 void NFA_State_move_add(NFA_State *state, NFA_State *next, char symbol)
 {
     NFA_Move *temp;
-    temp = realloc(state->moves, sizeof(NFA_Move *) * (state->moves_count + 1));
+    temp = realloc(state->moves, sizeof(NFA_Move) * (state->moves_count + 1));
     if (!temp) {
         fprintf(stderr, "realloc error: %s\n", __func__);
         pthread_exit(NULL);
