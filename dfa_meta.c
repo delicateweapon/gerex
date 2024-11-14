@@ -20,8 +20,8 @@ static void DFA_add_end(DFA *dfa, DFA_State *end)
 }
 
 #define CAPACITY (1 << 6)
-static NFA_State *considered_states[CAPACITY];
-static size_t considered_states_count;
+static NFA_State *considered_nfa_states[CAPACITY];
+static size_t considered_nfa_states_count;
 
 DFA *DFA_construct(NFA *nfa)
 {
@@ -39,20 +39,28 @@ DFA *DFA_construct(NFA *nfa)
     }
     dfa->ends_capacity = 4;
 
-    considered_states[0] = nfa->begin;
-    considered_states_count = 1;
+    considered_nfa_states[0] = nfa->begin;
+    considered_nfa_states_count = 1;
 
-    DFA_State *context;
+    DFA_State *context_dfa;
+    NFA_State *context_nfa;
+    NFA_State *next;
     char symbol;
 
-    for (size_t i = 0; i < considered_states_count; ++i) {
+    for (size_t i = 0; i < considered_nfa_states_count; ++i) {
         if (g_DFA_State_count != i) {
             (void)DFA_State_create();
         }
 
-        context = g_DFA_States[i];
+        context_nfa = considered_nfa_states[i];
+        context_dfa = g_DFA_States[i];
 
-        for (size_t i = 0; i < g_symbols_count; ++i);
+        for (size_t i = 0; i < g_symbols_count; ++i) {
+            next = NFA_State_find_symbol_next(context_nfa);
+            if (!next) {
+                continue;
+            }
+        }
     }
 
     return dfa;

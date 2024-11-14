@@ -33,6 +33,7 @@ extern size_t g_NFA_State_count;
 
 NFA_State *NFA_State_create(void);
 void NFA_State_move_add(NFA_State *state, NFA_State *next, char symbol);
+NFA_State *NFA_State_find_symbol_next(NFA_State *state);
 
 typedef struct nfa {
     NFA_State *begin;
