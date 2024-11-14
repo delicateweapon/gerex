@@ -4,8 +4,8 @@
 #include <stdint.h>
 
 #define MAX_ALLOCATIONS (1 << 8)
-extern void *allocations[MAX_ALLOCATIONS];
-extern size_t allocations_count;
+extern void *g_allocations[MAX_ALLOCATIONS];
+extern size_t g_allocations_count;
 
 void allocations_free_all(void);
 
@@ -70,6 +70,8 @@ typedef struct dfa_state {
     size_t moves_count;
 } DFA_State;
 
+extern size_t g_DFA_State_count;
+
 typedef struct {
     DFA_State *begin;
 
@@ -77,3 +79,6 @@ typedef struct {
     DFA_State ends_count;
     DFA_State ends_capacity;
 } DFA;
+
+
+void globals_reset(void);

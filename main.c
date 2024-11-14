@@ -21,6 +21,7 @@ int main(void)
         pthread_create(&g_regex_thread, NULL, regex_func, expr);
         pthread_join(g_regex_thread, NULL);
         allocations_free_all();
+        globals_reset();
     }
     return 0;
 }
