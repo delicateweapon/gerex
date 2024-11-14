@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 void *allocations[MAX_ALLOCATIONS];
-size_t allocations_count;
+size_t allocations_count = 0;
 
 void allocations_free_all(void)
 {

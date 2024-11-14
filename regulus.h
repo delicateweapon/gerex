@@ -55,3 +55,25 @@ NFA *NFA_closure(NFA *nfa);
 NFA *NFA_three_fourth_closure(NFA *nfa);
 
 NFA *NFA_parse(const char *expr);
+
+
+struct dfa_state;
+
+typedef struct {
+    struct dfa_state *next;
+    char sym;
+} DFA_Move;
+
+typedef struct dfa_state {
+    size_t id;
+    DFA_Move *moves;
+    size_t moves_count;
+} DFA_State;
+
+typedef struct {
+    DFA_State *begin;
+
+    DFA_State **ends;
+    DFA_State ends_count;
+    DFA_State ends_capacity;
+} DFA;
