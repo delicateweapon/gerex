@@ -12,7 +12,7 @@ DFA_State *DFA_State_create(void)
     result = malloc(sizeof(*result));
     g_allocations[g_allocations_count++] = result;
     if (!result) {
-        fprintf(stderr, "malloc error: %s\n", __func__);        
+        fprintf(stderr, "malloc error: %s\n", __func__);
         pthread_exit(NULL);
     }
 
@@ -24,6 +24,22 @@ DFA_State *DFA_State_create(void)
     return result;
 }
 
+static void DFA_add_end(DFA *dfa, DFA_State *end)
+{
+    if (dfa->ends_count == dfa->ends_capacity) {
+        DFA_State **temp;
+        temp = realloc(dfa->ends, sizeof(DFA_State *) * (dfa->ends_capacity * (3 / 2)));
+        if (!temp) {
+            fprintf(stderr, "realloc error: %s\n", __func__);
+            pthread_exit(NULL);
+        }
+        dfa->ends = temp;
+        dfa->ends_capacity *= (3 / 2);
+    }
+
+    dfa->ends[dfa->ends_count++] = end;
+}
+
 DFA *DFA_construct(NFA *nfa)
 {
     DFA *dfa = malloc(sizeof(*dfa));
@@ -32,6 +48,13 @@ DFA *DFA_construct(NFA *nfa)
         fprintf(stderr, "malloc error: %s\n", __func__);
         pthread_exit(NULL);
     }
+
+    dfa->ends = malloc(sizeof(DFA_State *) * 4);
+    if (!dfa->ends) {
+        fprintf(stderr, "malloc error: %s\n", __func__);
+        pthread_exit(NULL);
+    }
+    dfa->ends_capacity = 4;
 
     return dfa;
 }

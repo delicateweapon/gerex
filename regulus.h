@@ -76,8 +76,8 @@ typedef struct {
     DFA_State *begin;
 
     DFA_State **ends;
-    DFA_State ends_count;
-    DFA_State ends_capacity;
+    size_t ends_count;
+    size_t ends_capacity;
 } DFA;
 
 
