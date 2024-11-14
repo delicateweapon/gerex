@@ -14,6 +14,7 @@ uint8_t NFA_Op_precedence(NFA_Op op)
     case CONCAT:
         return 2;
     case CLOSURE:
+    case THREE_FOURTH_CLOSURE:
         return 3;
     }
 }
@@ -48,6 +49,20 @@ NFA *NFA_closure(NFA *nfa)
 
     EPSILON_MOVE(result->begin, nfa->begin);
     EPSILON_MOVE(result->begin, result->end);
+
+    EPSILON_MOVE(nfa->end, nfa->begin);
+    EPSILON_MOVE(nfa->end, result->end);
+
+    return result;
+}
+
+NFA *NFA_three_fourth_closure(NFA *nfa)
+{
+    NFA *result = NFA_create(true);
+
+    EPSILON_MOVE(result->begin, nfa->begin);
+    /* yeah, it is indeed 3/4 */
+    /* EPSILON_MOVE(result->begin, result->end); */
 
     EPSILON_MOVE(nfa->end, nfa->begin);
     EPSILON_MOVE(nfa->end, result->end);

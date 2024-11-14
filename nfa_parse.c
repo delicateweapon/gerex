@@ -61,6 +61,15 @@ static void ops_collapse(NFA_Op op)
             nfa1 = nfas[--nfas_count];
             nfas[nfas_count++] = NFA_closure(nfa1);
             break;
+
+        case THREE_FOURTH_CLOSURE:
+            if (nfas_count < 1) {
+                fprintf(stderr, "parse error: Could not form three-fourth-closure\n");
+                pthread_exit(NULL);
+            }
+            nfa1 = nfas[--nfas_count];
+            nfas[nfas_count++] = NFA_three_fourth_closure(nfa1);
+            break;
         }
 
         if (ops_count == 0) {
@@ -77,14 +86,14 @@ static void form_union_till_marker(void)
     if (nfas_count == marker) {
         return;
     }
-       
+
     NFA *nfa = NFA_create(true);
 
     size_t i = nfas_count;
     do {
         i--;
         EPSILON_MOVE(nfa->begin, nfas[i]->begin);
-        EPSILON_MOVE(nfas[i]->end, nfa->end);        
+        EPSILON_MOVE(nfas[i]->end, nfa->end);
     } while (i > marker);
 
     nfas_count = marker;
@@ -135,6 +144,13 @@ NFA *NFA_parse(const char *expr)
         case '*':
             ops_collapse(CLOSURE);
             ops[ops_count++] = CLOSURE;
+
+            append_concat = true;
+            break;
+
+        case '+':
+            ops_collapse(THREE_FOURTH_CLOSURE);
+            ops[ops_count++] = THREE_FOURTH_CLOSURE;
 
             append_concat = true;
             break;
