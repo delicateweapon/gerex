@@ -2,27 +2,29 @@
 
 bool DFA_match(DFA *dfa, const char *text)
 {
-    DFA_State *state, *temp;
+    DFA_State *state;
     DFA_Move *move;
     size_t i, j;
     char c;
+    bool moved;
 
     state = dfa->begin;
     c = text[i = 0];
     while (c != '\0') {
-        temp = state;
+        moved = false;
         j = 0;
         while (j < state->moves_count) {
             move = &(state->moves[j]);
             if (move->symbol == c) {
                 state = move->next;
+                moved = true;
                 c = text[++i];
                 break;
             }
             j++;
         }
 
-        if (temp == state) {
+        if (!moved) {
             return false;
         }
     }

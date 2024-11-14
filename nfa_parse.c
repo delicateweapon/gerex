@@ -113,6 +113,7 @@ NFA *NFA_parse(const char *expr)
     bool treat_as_symbol;
 
     append_concat = false;
+    treat_as_symbol = false;
     c = expr[i = 0];
     while (c != '\0') {
         if (isalnum(c)) {

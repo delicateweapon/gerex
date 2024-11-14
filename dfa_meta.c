@@ -91,8 +91,8 @@ DFA *DFA_construct(NFA *nfa)
             DFA_add_end(dfa, context_dfa);
         }
 
-        dfa->begin = g_DFA_States[0];
     }
 
+    dfa->begin = g_DFA_States[0];
     return dfa;
 }
