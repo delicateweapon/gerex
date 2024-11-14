@@ -8,6 +8,8 @@ void *regex_func(void *args)
 {
     NFA *nfa = NFA_parse(args);
     printf("Oh look, it got parsed\n");
+    DFA *dfa = DFA_construct(nfa);
+    bool match = DFA_match("");
     return NULL;
 }
 

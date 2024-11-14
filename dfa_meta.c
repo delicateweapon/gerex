@@ -42,13 +42,13 @@ DFA *DFA_construct(NFA *nfa)
     considered_nfa_states[0] = nfa->begin;
     considered_nfa_states_count = 1;
 
-    DFA_State *context_dfa;
-    NFA_State *context_nfa;
-    NFA_State *next;
-    char symbol;
+    static DFA_State *context_dfa;
+    static NFA_State *context_nfa;
+    static NFA_State *next;
+    static char symbol;
 
     for (size_t i = 0; i < considered_nfa_states_count; ++i) {
-        if (g_DFA_State_count != i) {
+        if (g_DFA_State_count - 1 != i) {
             (void)DFA_State_create();
         }
 
@@ -56,11 +56,40 @@ DFA *DFA_construct(NFA *nfa)
         context_dfa = g_DFA_States[i];
 
         for (size_t i = 0; i < g_symbols_count; ++i) {
-            next = NFA_State_find_symbol_next(context_nfa);
+            next = NFA_State_find_symbol_next(context_nfa, g_symbols[i]);
             if (!next) {
                 continue;
             }
+
+            bool found = false;
+            size_t j = considered_nfa_states_count;
+            do {
+                --j;
+                if (next == considered_nfa_states[j]) {
+                    found = true;
+                    break;
+                }
+            } while (j > 0);
+
+            if (found) {
+                DFA_State_move_add(
+                    context_dfa,
+                    g_DFA_States[j],
+                    symbol);
+            } else {
+                considered_nfa_states[considered_nfa_states_count++] = next;
+                DFA_State_move_add(
+                    context_dfa,
+                    DFA_State_create(),
+                    symbol);
+            }
         }
+
+        if (context_dfa->moves_count == 0 || context_nfa == nfa->end) {
+            DFA_add_end(dfa, context_dfa);
+        }
+
+        dfa->begin = g_DFA_States[0];
     }
 
     return dfa;

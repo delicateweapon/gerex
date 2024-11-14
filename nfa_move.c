@@ -19,3 +19,4 @@ void NFA_State_move_add(NFA_State *state, NFA_State *next, char symbol)
     };
     state->moves_count++;
 }
+

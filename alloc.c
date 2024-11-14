@@ -2,16 +2,16 @@
 
 #include <stdlib.h>
 
-void *allocations[MAX_ALLOCATIONS];
-size_t allocations_count = 0;
+void *g_allocations[MAX_ALLOCATIONS];
+size_t g_allocations_count = 0;
 
 void allocations_free_all(void)
 {
-    if (allocations_count == 0) {
+    if (g_allocations_count == 0) {
         return;
     }
     do {
-        allocations_count--;
-        free(allocations[allocations_count]);
-    } while (allocations_count > 0);
+        g_allocations_count--;
+        free(g_allocations[g_allocations_count]);
+    } while (g_allocations_count > 0);
 }
