@@ -75,7 +75,7 @@ int DFA_construct(NFA *nfa)
             }
         }
 
-        if (NFA_State_check_end(nfa, context_nfa)) {
+        if (NFA_State_check_end(nfa, context_nfa) || context_dfa->move_count == 0) {
             context_dfa->is_end = true;
         }
 

@@ -76,22 +76,26 @@ Matches *Matches_generate(char *regex, char *text)
         }
 
         if (!moved) {
-            if (end > begin) {
+            if (end >= begin) {
                 Matches_append(matches, (Match) { begin, end });
             }
             state = g_start_state;
-            begin = i + 1;
-            c = text[++i];
+            if (begin != end) {
+                c = text[++i];
+            }
+            begin = i;
         } else {
             if (state->is_end) {
-                end = i - 1;
+                if (i != 0) {
+                    end = i - 1;
+                }
             }
         }
     }
 
     if (end > begin) {
-        if (state->is_end) {            
-                Matches_append(matches, (Match) { begin, end });
+        if (state->is_end) {
+            Matches_append(matches, (Match) { begin, end });
         }
     }
 
