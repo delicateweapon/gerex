@@ -1,5 +1,6 @@
 #include "dfa.h"
 #include "match.h"
+#include "nfa.h"
 #include "time.h"
 
 bool DFA_match(char *text)
@@ -76,12 +77,19 @@ Matches *Matches_generate(char *regex, char *text)
         }
 
         if (!moved) {
-            if (end >= begin) {
+            if (end > begin) {
                 Matches_append(matches, (Match) { begin, end });
             }
-            state = g_start_state;
 
             bool update_i = true;
+            state = g_start_state;
+
+            if (end == begin) {
+                if (state->moves[0].symbol == c) {
+                    Matches_append(matches, (Match) { begin, end });
+                }
+            }
+
             for (size_t k = 0; k < state->move_count; ++k) {
                 if (state->moves[k].symbol == c) {
                     update_i = false;
