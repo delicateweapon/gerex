@@ -80,10 +80,19 @@ Matches *Matches_generate(char *regex, char *text)
                 Matches_append(matches, (Match) { begin, end });
             }
             state = g_start_state;
-            if (begin != end) {
+
+            bool update_i = true;
+            for (size_t k = 0; k < state->move_count; ++k) {
+                if (state->moves[k].symbol == c) {
+                    update_i = false;
+                    break;
+                }
+            }
+
+            if (update_i) {
+                begin = i + 1;
                 c = text[++i];
             }
-            begin = i;
         } else {
             if (state->is_end) {
                 if (i != 0) {
