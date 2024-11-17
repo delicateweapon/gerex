@@ -1,0 +1,3 @@
+BasedOnStyle: Webkit
+PointerAlignment: Right
+UseTab: Never
