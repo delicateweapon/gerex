@@ -35,7 +35,7 @@ size_t g_symbols_capacity;
 size_t g_symbol_count;
 
 #define INIT_CAPACITY 16
-bool initialized = false;
+static bool initialized = false;
 
 static inline int initialize(void)
 {
@@ -54,6 +54,12 @@ static inline int initialize(void)
 
 NFA *NFA_from_symbol(char symbol) 
 {
+    for (size_t i = 0; i < g_symbol_count; ++i) {
+        if (symbol == g_symbols[i]) {
+            goto after_g_symbols;
+        }
+    }
+
     if (g_symbols_capacity == g_symbol_count) {
         if (!initialized) {
             int result_code = initialize();
@@ -73,13 +79,9 @@ NFA *NFA_from_symbol(char symbol)
 
     g_symbols[g_symbol_count++] = symbol;
 
-    NFA *result;
+after_g_symbols:
 
-    result = malloc(sizeof(*result));
-    if (result == NULL) {
-        fprintf(stderr, "malloc error: %s\n", __func__);
-        return NULL;
-    }
+    NFA *result = NFA_create(true);
 
     int result_code = NFA_State_move_add(result->begin, result->end, symbol);
     if (result_code != 0) {

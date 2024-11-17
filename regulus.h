@@ -4,6 +4,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
+#include <stddef.h>
+
 #define REGEX_MAX_LENGTH (1 << 6)
 extern char g_regex[REGEX_MAX_LENGTH];
 extern size_t g_regex_length;

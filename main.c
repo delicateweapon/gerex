@@ -1,6 +1,8 @@
+#include "help.h"
 #include "match.h"
 #include "regulus.h"
-#include "help.h"
+
+void print_dfa();
 
 #include <stdio.h>
 #include <string.h>
@@ -31,13 +33,14 @@ int main(int argc, char **argv)
     g_text_length = fread(g_text, sizeof(char), TEXT_MAX_LENGTH, f);
     fclose(f);
 
-    Match matches[3] = {
-        {3, 13},
-        {45, 80},
-        {120, 130},
-    };
+    Matches *matches = Matches_generate(g_regex, g_text);
+    if (matches == NULL) {
+        return -1;
+    }
 
-    print_text_with_matches(g_text, matches, 3);
+    print_text_with_matches(g_text, matches->p, matches->count);
+    printf("\n\n\n");
+    print_dfa();
 
     return 0;
 }

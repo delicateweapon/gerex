@@ -9,7 +9,7 @@ size_t g_DFA_State_count = 0;
 
 #define INIT_CAPACITY (1 << 6)
 
-bool initialized = false;
+static bool initialized = false;
 
 static inline int initialize(void) 
 {

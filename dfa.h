@@ -25,3 +25,5 @@ int DFA_State_move_add(DFA_State *state, DFA_State *next, char symbol);
 
 extern DFA_State *g_start_state;
 int DFA_construct(NFA *nfa);
+
+bool DFA_match(char *text);

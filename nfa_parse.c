@@ -2,12 +2,13 @@
 
 #include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 static NFA **nfas;
 static size_t nfas_count;
 static size_t nfas_capacity;
 
-static NFA_Op **ops;
+static NFA_Op *ops;
 static size_t ops_count;
 static size_t ops_capacity;
 
@@ -54,14 +55,14 @@ static inline int initialize(void)
 #define OPS_APPEND(_op)                                                            \
     do {                                                                           \
         if (ops_count == ops_capacity) {                                           \
-            NFA_Op *temp = realloc(ops, sizeof(NFA *) * (ops_capacity * 1.5));     \
+            NFA_Op *temp = realloc(ops, sizeof(NFA_Op) * (ops_capacity * 1.5));    \
             if (temp == NULL) {                                                    \
                 fprintf(stderr, "parse error: failed to increase ops capacity\n"); \
                 return NULL;                                                       \
             }                                                                      \
             ops_capacity *= 1.5;                                                   \
         }                                                                          \
-        ops[nfas_count++] = _op;                                                   \
+        ops[ops_count++] = _op;                                                    \
     } while (0)
 
 static int ops_collapse(NFA_Op op)
@@ -165,7 +166,7 @@ static int ops_collapse(NFA_Op op)
     return 0;
 }
 
-#define COLLAPSE_TILL(op)                   \
+#define OPS_COLLAPSE(op)                    \
     do {                                    \
         int result_code = ops_collapse(op); \
         if (result_code != 0) {             \
@@ -173,7 +174,7 @@ static int ops_collapse(NFA_Op op)
         }                                   \
     } while (0)
 
-NFA *NFA_parse(char *regex)
+NFA *NFA_parse(const char *regex)
 {
     if (initialize() != 0) {
         fprintf(stderr, "parse_error: failed to initialize the requierd arrays\n");
@@ -196,7 +197,7 @@ NFA *NFA_parse(char *regex)
 
         if (isalnum(c) || treat_as_alnum) {
             if (append_concat) {
-                COLLAPSE_TILL(CONCAT);
+                OPS_COLLAPSE(CONCAT);
                 OPS_APPEND(CONCAT);
             }
 
@@ -204,7 +205,7 @@ NFA *NFA_parse(char *regex)
             if (nfa_temp == NULL) {
                 return NULL;
             }
-            NFAS_APPEND(NFA_from_symbol(c));
+            NFAS_APPEND(nfa_temp);
 
             treat_as_alnum = false;
             append_concat = true;
@@ -214,26 +215,26 @@ NFA *NFA_parse(char *regex)
 
         switch (c) {
         case '*':
-            COLLAPSE_TILL(CLOSURE);
+            OPS_COLLAPSE(CLOSURE);
             OPS_APPEND(CLOSURE);
             append_concat = true;
             break;
 
         case '+':
-            COLLAPSE_TILL(THREE_FOURTH_CLOSURE);
+            OPS_COLLAPSE(THREE_FOURTH_CLOSURE);
             OPS_APPEND(THREE_FOURTH_CLOSURE);
             append_concat = true;
             break;
 
         case '|':
-            COLLAPSE_TILL(UNION);
+            OPS_COLLAPSE(UNION);
             OPS_APPEND(UNION);
             append_concat = false;
             break;
 
         case '(':
             if (append_concat) {
-                COLLAPSE_TILL(CONCAT);
+                OPS_COLLAPSE(CONCAT);
                 OPS_APPEND(CONCAT);
             }
 
@@ -242,7 +243,7 @@ NFA *NFA_parse(char *regex)
             break;
 
         case ')':
-            COLLAPSE_TILL(RPAREN);
+            OPS_COLLAPSE(RPAREN);
             if (ops[ops_count] != LPAREN) {
                 fprintf(stderr, "parse_error: missing \'(\' for \')\' at index %zu\n", i);
                 return NULL;

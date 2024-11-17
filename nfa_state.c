@@ -82,6 +82,10 @@ NFA_State *NFA_State_find_symbol_next(NFA_State *state, char symbol)
     NFA_Move *m;
     NFA_State *result;
 
+    if (state->move_count == 0) {
+        return NULL;
+    }
+
     if (state->move_count == 1) {
         m = &(state->moves[0]);
         if (m->symbol == symbol) {

@@ -2,7 +2,6 @@
 
 DFA_State *g_start_state;
 
-static size_t context_id;
 static NFA_State *context_nfa;
 static DFA_State *context_dfa;
 
@@ -15,9 +14,14 @@ int DFA_construct(NFA *nfa)
     checkpoint_nfa_states[0] = nfa->begin;
     checkpoint_nfa_state_count = 1;
 
+    void *p = DFA_State_create();
+    if (p == NULL) {
+        return -1;
+    }
+
     for (size_t i = 0; i < checkpoint_nfa_state_count; ++i) {
-        if (g_DFA_State_count != i) {
-            void *p = DFA_State_create();
+        if (g_DFA_State_count - 1 < i) {
+            p = DFA_State_create();
             if (p == NULL) {
                 return -1;
             }

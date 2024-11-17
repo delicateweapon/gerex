@@ -18,7 +18,7 @@ uint8_t NFA_Op_precedence(NFA_Op op)
 
 #define EPSILON_MOVE(_s1, _s2)                                          \
     do {                                                                \
-        int result_code = NFA_State_move_add(_s1, _s1, SYMBOL_EPSILON); \
+        int result_code = NFA_State_move_add(_s1, _s2, SYMBOL_EPSILON); \
         if (result_code != 0) {                                         \
             return NULL;                                                \
         }                                                               \
