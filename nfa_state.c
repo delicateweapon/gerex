@@ -107,3 +107,28 @@ NFA_State *NFA_State_find_symbol_next(NFA_State *state, char symbol)
 
     return NULL;
 }
+
+bool NFA_State_check_end(NFA *nfa, NFA_State *state) 
+{
+    NFA_Move *m;
+    if (state->move_count == 1) {
+        m = &(state->moves[0]);
+        if (m->symbol != SYMBOL_EPSILON) {
+            return false;
+        }
+    }
+
+    for (size_t i = 0; i < state->move_count; ++i) {
+        m = &(state->moves[0]);
+        if (m->next == nfa->end) {
+            return true;
+        }
+
+        bool recurse = NFA_State_check_end(nfa, m->next);
+        if (recurse) {
+            return true;
+        }
+    } 
+
+    return false;
+}

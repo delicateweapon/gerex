@@ -56,5 +56,6 @@ typedef enum {
 uint8_t NFA_Op_precedence(NFA_Op op);
 
 NFA_State *NFA_State_find_symbol_next(NFA_State *state, char symbol);
+bool NFA_State_check_end(NFA *nfa, NFA_State *state);
 
 NFA *NFA_parse(const char *regex);
